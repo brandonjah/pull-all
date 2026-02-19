@@ -4,6 +4,7 @@ Batch-pull all git repos in a directory. Checks out the default branch, pulls la
 
 - **Rails repos** — runs `bundle install` (if Gemfile changed) and `rails db:migrate` (if new migrations)
 - **JS/Node repos** — runs `npm install`, `yarn install`, or `pnpm install` (if lockfile/package.json changed), auto-detecting the package manager
+- **Docker Compose** — optionally starts services with `docker compose up -d`, gracefully handling already-running containers
 
 Handles uncommitted changes (offers to stash) and non-default branches (offers to switch) interactively.
 
@@ -50,4 +51,15 @@ pullall
 
 # Argument takes priority over the environment variable
 pullall /path/to/other/repos
+
+# Also start docker compose services
+pullall --docker /path/to/your/repos
+pullall -d
 ```
+
+## Options
+
+| Flag | Description |
+|------|-------------|
+| `--docker`, `-d` | Start docker compose services for repos that have a compose file |
+| `--help`, `-h` | Show usage information |

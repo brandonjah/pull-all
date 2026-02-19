@@ -1,13 +1,42 @@
 #!/bin/bash
 
 # pull-all.sh — Check out the default branch and pull latest for all repos in a directory
-# Usage: ./pull-all.sh [directory]
+# Usage: ./pull-all.sh [--docker] [directory]
 #        PULL_ALL_DIR=~/code/myproject ./pull-all.sh
 
-TARGET_DIR="${1:-${PULL_ALL_DIR:-}}"
+DOCKER_UP=false
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --docker|-d)
+      DOCKER_UP=true
+      shift
+      ;;
+    --help|-h)
+      echo "Usage: pull-all [--docker] <directory>"
+      echo ""
+      echo "Options:"
+      echo "  --docker, -d   Start docker compose services for repos that have a compose file"
+      echo ""
+      echo "The target directory can also be set via PULL_ALL_DIR environment variable."
+      exit 0
+      ;;
+    -*)
+      echo "Unknown option: $1"
+      echo "Run 'pull-all --help' for usage."
+      exit 1
+      ;;
+    *)
+      TARGET_DIR="$1"
+      shift
+      ;;
+  esac
+done
+
+TARGET_DIR="${TARGET_DIR:-${PULL_ALL_DIR:-}}"
 
 if [ -z "$TARGET_DIR" ]; then
-  echo "Usage: pull-all <directory>"
+  echo "Usage: pull-all [--docker] <directory>"
   echo "   or: export PULL_ALL_DIR=~/code/myproject"
   exit 1
 fi
@@ -198,6 +227,39 @@ for dir in "$TARGET_DIR"/*/; do
         else
           echo -e "${RED}   Install failed:${NC}"
           echo "$js_install_output" | tail -5 | sed 's/^/      /'
+        fi
+      fi
+    fi
+
+    # --- Docker Compose ---
+    if [ "$DOCKER_UP" = true ]; then
+      compose_file=""
+      for f in "docker-compose.yml" "docker-compose.yaml" "compose.yml" "compose.yaml"; do
+        if [ -f "$dir/$f" ]; then
+          compose_file="$f"
+          break
+        fi
+      done
+
+      if [ -n "$compose_file" ]; then
+        echo -e "${BLUE}   🐳 Docker Compose detected ($compose_file)${NC}"
+
+        running_services=$(docker compose ps --status running --format '{{.Name}}' 2>/dev/null | wc -l | tr -d ' ')
+
+        if [ "$running_services" -gt 0 ]; then
+          echo -e "${GREEN}   Already running ($running_services service(s) up).${NC}"
+          echo -e "   Running ${BOLD}docker compose up -d${NC} to pick up changes..."
+        else
+          echo -e "   Starting services with ${BOLD}docker compose up -d${NC}..."
+        fi
+
+        compose_output=$(docker compose up -d 2>&1)
+        if [ $? -eq 0 ]; then
+          new_running=$(docker compose ps --status running --format '{{.Name}}' 2>/dev/null | wc -l | tr -d ' ')
+          echo -e "${GREEN}   Docker Compose up ($new_running service(s) running).${NC}"
+        else
+          echo -e "${RED}   Docker Compose failed:${NC}"
+          echo "$compose_output" | tail -5 | sed 's/^/      /'
         fi
       fi
     fi
