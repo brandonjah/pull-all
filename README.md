@@ -24,20 +24,30 @@ Handles uncommitted changes (offers to stash) and non-default branches (offers t
 3. Add an alias to your `~/.zshrc`:
 
    ```bash
-   echo 'alias pullall="~/code/pull-all/pull-all.sh"' >> ~/.zshrc
+   # Option A: pass the directory each time
+   alias pullall="~/code/pull-all/pull-all.sh"
+
+   # Option B: set a default directory via environment variable
+   export PULL_ALL_DIR="$HOME/code/myproject"
+   alias pullall="~/code/pull-all/pull-all.sh"
+   ```
+
+4. Reload your shell:
+
+   ```bash
    source ~/.zshrc
    ```
 
-4. Run it:
-
-   ```bash
-   pullall
-   ```
-
-## Configuration
-
-By default the script syncs all repos under `~/code/homebot`. To change the target directory, edit the `HOMEBOT_DIR` variable at the top of `pull-all.sh`:
+## Usage
 
 ```bash
-HOMEBOT_DIR="$HOME/code/homebot"
+# Pass a directory as an argument
+pullall ~/code/myproject
+
+# Or use the PULL_ALL_DIR environment variable
+export PULL_ALL_DIR=~/code/myproject
+pullall
+
+# Argument takes priority over the environment variable
+pullall ~/code/other-project
 ```

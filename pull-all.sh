@@ -1,9 +1,23 @@
 #!/bin/bash
 
-# pull-all.sh — Check out the default branch and pull latest for all homebot repos
-# Usage: ./pull-all.sh
+# pull-all.sh — Check out the default branch and pull latest for all repos in a directory
+# Usage: ./pull-all.sh [directory]
+#        PULL_ALL_DIR=~/code/myproject ./pull-all.sh
 
-HOMEBOT_DIR="$HOME/code/homebot"
+TARGET_DIR="${1:-${PULL_ALL_DIR:-}}"
+
+if [ -z "$TARGET_DIR" ]; then
+  echo "Usage: pull-all <directory>"
+  echo "   or: export PULL_ALL_DIR=~/code/myproject"
+  exit 1
+fi
+
+TARGET_DIR=$(cd "$TARGET_DIR" 2>/dev/null && pwd)
+
+if [ ! -d "$TARGET_DIR" ]; then
+  echo "Error: '$TARGET_DIR' is not a valid directory."
+  exit 1
+fi
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -18,11 +32,11 @@ fail_count=0
 
 echo ""
 echo -e "${BOLD}========================================${NC}"
-echo -e "${BOLD}  Homebot Repo Sync${NC}"
+echo -e "${BOLD}  Pull All — $(basename "$TARGET_DIR")${NC}"
 echo -e "${BOLD}========================================${NC}"
 echo ""
 
-for dir in "$HOMEBOT_DIR"/*/; do
+for dir in "$TARGET_DIR"/*/; do
   # Skip non-git directories
   [ -d "$dir/.git" ] || continue
 
