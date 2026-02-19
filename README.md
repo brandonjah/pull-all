@@ -9,27 +9,27 @@ Handles uncommitted changes (offers to stash) and non-default branches (offers t
 
 ## Setup
 
-1. Clone this repo:
+1. Clone this repo somewhere on your machine:
 
    ```bash
-   git clone git@github.com:brandonjah/pull-all.git ~/code/pull-all
+   git clone git@github.com:brandonjah/pull-all.git /path/to/pull-all
    ```
 
 2. Make the script executable:
 
    ```bash
-   chmod +x ~/code/pull-all/pull-all.sh
+   chmod +x /path/to/pull-all/pull-all.sh
    ```
 
 3. Add an alias to your `~/.zshrc`:
 
    ```bash
    # Option A: pass the directory each time
-   alias pullall="~/code/pull-all/pull-all.sh"
+   alias pullall="/path/to/pull-all/pull-all.sh"
 
    # Option B: set a default directory via environment variable
-   export PULL_ALL_DIR="$HOME/code/myproject"
-   alias pullall="~/code/pull-all/pull-all.sh"
+   export PULL_ALL_DIR="/path/to/your/repos"
+   alias pullall="/path/to/pull-all/pull-all.sh"
    ```
 
 4. Reload your shell:
@@ -42,12 +42,12 @@ Handles uncommitted changes (offers to stash) and non-default branches (offers t
 
 ```bash
 # Pass a directory as an argument
-pullall ~/code/myproject
+pullall /path/to/your/repos
 
 # Or use the PULL_ALL_DIR environment variable
-export PULL_ALL_DIR=~/code/myproject
+export PULL_ALL_DIR=/path/to/your/repos
 pullall
 
 # Argument takes priority over the environment variable
-pullall ~/code/other-project
+pullall /path/to/other/repos
 ```
