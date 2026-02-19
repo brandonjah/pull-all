@@ -242,7 +242,7 @@ for dir in "$TARGET_DIR"/*/; do
       done
 
       if [ -n "$compose_file" ]; then
-        echo -e "${BLUE}   🐳 Docker Compose detected ($compose_file)${NC}"
+        echo -e "${BLUE}   🐳 Docker Compose detected${NC} ${BOLD}$compose_file${NC}"
 
         running_services=$(docker compose ps --status running --format '{{.Name}}' 2>/dev/null | wc -l | tr -d ' ')
 
